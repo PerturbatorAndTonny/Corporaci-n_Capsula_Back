@@ -1,0 +1,70 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "warn",
+    "perf": "warn"
+  },
+  "rules": {
+    "no-async-promise-executor": "error",
+    "no-promise-executor-return": "warn",
+    "require-await": "warn",
+    "typescript/only-throw-error": "error",
+    "no-console": "warn",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+      }
+    ],
+    "no-var": "error",
+    "prefer-const": "error",
+    "eqeqeq": "error",
+    "no-debugger": "error",
+    "no-eval": "error",
+    "no-new-wrappers": "error",
+  },
+  "overrides": [
+    {
+      "files":["src/routes/**"],
+      "rules": {
+        "no-console": "error",
+        "require-await": "error"
+      }
+    },
+    {
+      "files": ["src/middlewares/**"],
+      "rules": {
+        "no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "args": "after-used",
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app.js"],
+      "rules": {
+        "no-unused-vars": "allow"
+      }
+    }
+  ],
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "globals": {
+    "process": "readonly"
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "build/**",
+    "node_modules/**",
+    "coverage/**",
+    "*.config.js"
+  ]
+}
