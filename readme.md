@@ -51,3 +51,19 @@ function nameFunction(parameters){
 }
 ```
 
+Para crear nuevas ramas, nos guiaremos de la nomenclatura [Conventional Branch](https://nodejs.org/es/download), ya que **no usaremos la rama MASTER para codificar directamente**. esta nomenclatura se maneja de la siguiente manera:
+
+```env
+main -> rama principal de desarrollo (tambien llamada master/)
+feature -> nombre de rama donde se desarrollan nuevas caracteristicas del sistema (tambien apodada feat)
+bugfix -> nombre de rama principal para para solucionar errores no criticos
+hotfix -> nombre de rama principal para para solucionar criticos/severos
+chore -> prefijo de rama usado para ramas no relacionadas a codificación (documentación, actualizacion de dependencias)
+```
+
+algunos ejemplos serian
+```env
+feature/add-login-page
+bugfix/fix-header-bug
+hotfix/security-patch
+```
