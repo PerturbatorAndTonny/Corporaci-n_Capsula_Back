@@ -1,6 +1,7 @@
 import { ZodError } from 'zod';
+import type { Request, Response, NextFunction } from 'express';
 
-export const verifyData = (schema) => (req, res, next) => {
+export const verifyData = (schema: { parse: (arg: any) => void }) => (req: Request, res: Response, next: NextFunction) => {
   try {
     schema.parse(req.body);
     next();
