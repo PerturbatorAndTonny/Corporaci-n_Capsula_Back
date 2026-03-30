@@ -5,19 +5,24 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=.env index.js",
-    "start": "node index.js",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix src/"
+    "lint:fix": "oxlint --fix src/",
+    "build": "tsc",
+    "dev": "tsx watch --env-file=.env ./index.ts",
+    "start:prod": "node --env-file=.env dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.32.1",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
-    "oxlint": "^1.56.0"
+    "@types/node": "^25.5.0",
+    "oxlint": "^1.56.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

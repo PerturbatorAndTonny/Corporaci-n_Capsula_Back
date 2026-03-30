@@ -3,7 +3,7 @@ import { verifyData } from "../middlewares/verifyData.js";
 import { schemaOne } from "../schemas/schemaOne.js";
 import { controllerOne, controllerTwo, controllerThree } from "../controllers/controllerOne.js"
 
-const router = Router();
+const router: Router = Router();
 
 router.get("/ping", controllerOne);
 router.get("/ping/:id", controllerTwo);

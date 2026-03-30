@@ -1,7 +1,8 @@
 import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 
-import routeOne from "./routes/routeOne.js";
+import routeOne from "../src/routes/routeOne.js";
 
 const app = express();
 
@@ -11,7 +12,7 @@ app.use(morgan("dev"))
 app.use("/api/v1", routeOne)
 
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, _next: NextFunction) => {
   res.status(404).json({
     message: "Not found"
   })
