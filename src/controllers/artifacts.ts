@@ -1,9 +1,10 @@
+
 import { Request, Response } from 'express';
 import { CreateArtifactInput } from '../schemas/artifacts.js';
 import { artifactInventory, Artifact } from '../models/artifacts.js';
 
-
-export const createArtifact = async (req: Request<{}, {}, CreateArtifactInput>,res: Response): Promise<void> => {
+// oxlint-disable-next-line typescript/ban-types
+export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
   const artifactData = req.body;
   const existingArtifact = artifactInventory.find(
     (artifact) => artifact.code === artifactData.code
@@ -13,7 +14,6 @@ export const createArtifact = async (req: Request<{}, {}, CreateArtifactInput>,r
     res.status(400).json({
       message: 'Artifact code already exists'
     })
-    return;
   }
 
   const newArtifact: Artifact = {
