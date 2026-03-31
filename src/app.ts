@@ -4,6 +4,7 @@ import morgan from "morgan";
 
 import routeOne from "../src/routes/routeOne.js";
 import userRoutes from "./routes/userRoutes.js";
+import artifactRoutes from "./routes/artifacts.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(morgan("dev"))
 app.use("/api/v1", routeOne)
 app.use("/users", userRoutes)
 
+app.use('/api', artifactRoutes);
 
 app.use((req: Request, res: Response, _next: NextFunction) => {
   res.status(404).json({
