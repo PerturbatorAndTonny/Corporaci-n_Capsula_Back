@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(morgan("dev"))
 
 app.use("/api/v1", routeOne)
-app.use('/api', artifactRoutes);
+app.use('/api/v1', artifactRoutes);
 
 app.use((req: Request, res: Response, _next: NextFunction) => {
   res.status(404).json({
