@@ -16,11 +16,11 @@ export const newSession = (req: Request, res: Response) => {
 
     */
 
-    const token = createSession("Admin")
+    const token = createSession("Administrador")
 
     return res.status(200).json({
       message: "Session created successfully",
-      data: "Admin",
+      data: "Administrador",
       session: token
     })
 
