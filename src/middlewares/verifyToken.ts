@@ -2,6 +2,8 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import type { jwtPayload } from '../utils/session.js'
 
+const secret = process.env.JWT_SECRET as string
+
 //mover esta modificacion al type Required a un achivo de tipados
 declare global {
   namespace Express {
@@ -20,7 +22,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
   }
 
   try {
-    const decoded = jwt.verify(token, 'secretHere') as jwtPayload;
+    const decoded = jwt.verify(token, secret) as jwtPayload;
     req.user = decoded;
     next();
   } catch {
