@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { createSession } from "../utils/session.js";
 // import type { AuthInput } from "../schemas/auth.js";
 
-export const newSession = (req: Request, res: Response) => {
+export const newSession = async (req: Request, res: Response) => {
   try {
     /*
     Aquí iría la lógica para verificar las credenciales del usuario
@@ -16,11 +16,11 @@ export const newSession = (req: Request, res: Response) => {
 
     */
 
-    const token = createSession("Admin")
+    const token = await createSession({ role: "Administrador" })
 
-    return res.status(200).json({
+    return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
-      data: "Admin",
+      data: "Administrador",
       session: token
     })
 
