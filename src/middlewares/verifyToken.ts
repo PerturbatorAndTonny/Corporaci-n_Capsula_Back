@@ -1,17 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import type { jwtPayload } from '../utils/session.js'
+import type { jwtPayload } from '../types/index.js'
 
 const secret = process.env.JWT_SECRET as string
-
-//mover esta modificacion al type Required a un achivo de tipados
-declare global {
-  namespace Express {
-    interface Request {
-      user?: jwtPayload;
-    }
-  }
-}
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.cookies

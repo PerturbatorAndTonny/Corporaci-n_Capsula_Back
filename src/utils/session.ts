@@ -1,9 +1,5 @@
 import jwt from 'jsonwebtoken';
-
-//mover el type jwtPayload a un achivo de tipados
-export type jwtPayload = {
-  role:string
-}
+import type { jwtPayload } from '../types/index.js'
 
 const secret = process.env.JWT_SECRET as string
 
