@@ -12,15 +12,15 @@ declare global {
 }
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  const { session } = req.body
+  const { token } = req.cookies
 
-  if (!session) {
+  if (!token) {
     res.status(401).json({ error: "Token requerido" });
     return;
   }
 
   try {
-    const decoded = jwt.verify(session, 'secretHere') as jwtPayload;
+    const decoded = jwt.verify(token, 'secretHere') as jwtPayload;
     req.user = decoded;
     next();
   } catch {
