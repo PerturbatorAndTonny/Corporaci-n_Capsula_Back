@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-export const AuthTypeEnum = z.enum(["FACIAL", "DNA_HUMA"], {
-    errorMap: () => ({ message: "El tipo de auth debe ser facial o dna_human" })
+export const AuthTypeEnum = z.enum(["FACIAL", "DNA_HUMAN"], {
+    error: "El tipo de auth debe ser FACIAL o DNA_HUMAN"
 });
 
 export const schemaUserCreate = z.object({
@@ -21,6 +21,8 @@ export const schemaUserCreate = z.object({
     pass: z.string({
         required_error: "La contraseña es requerida",
     }).min(8, "La contraseña debe tener al menos 8 caracteres"),
+
+    authType: AuthTypeEnum
 });
 
 export type UserCreate = z.infer<typeof schemaUserCreate>;
