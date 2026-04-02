@@ -11,7 +11,7 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Re
   )
 
   if (existingArtifact) {
-    res.status(400).json({
+   return res.status(400).json({
       message: 'Artifact code already exists'
     })
   }
@@ -23,7 +23,7 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Re
 
   artifactInventory.push(newArtifact);
 
-  res.status(201).json({
+ return res.status(201).json({
     message: 'Artifact created successfully',
     data: newArtifact
   })
