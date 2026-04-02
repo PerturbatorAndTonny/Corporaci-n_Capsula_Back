@@ -5,12 +5,12 @@ export type jwtPayload = {
   role:string
 }
 
-export  function createSession(userRole: string): string {
-  const payload: jwtPayload = {
-    role: userRole,
-  }
-  const token = jwt.sign(payload, "secretHere", {
-    expiresIn: '1h',
-  });
-  return token;
-}
+// oxlint-disable-next-line require-await
+export async function createSession (payload: jwtPayload): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    jwt.sign(payload, 'secretHere', (err, token) => {
+      if (err) reject(err)
+      resolve(token as string)
+    })
+  })
+} 
