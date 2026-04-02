@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { UserCreate } from '../schemas/schemaUser.js';
+import {User, usersDB } from '../models/modelUser.js';
 
 const users_role = ['ADMIN', 'CIENTIFICO', 'GUERRERO'];
 
-const usersDB: any[] = [];
+
 
 export const createUser = (req: Request<{}, {}, UserCreate>, res: Response) => {
     try {
@@ -23,6 +24,8 @@ export const createUser = (req: Request<{}, {}, UserCreate>, res: Response) => {
             age,
             idrol: idrol.toUpperCase(),
             authType,
+            state: true,
+            failed_attempts: 0,
             createdAt: new Date().toISOString(),
         };
         usersDB.push(newUser, pass);
@@ -39,4 +42,19 @@ export const createUser = (req: Request<{}, {}, UserCreate>, res: Response) => {
             message: "Error al crear el usuario"
     });
   }
+};
+
+export const getUsers = (req: Request, res: Response) => {
+    try {
+       
+        return res.status(200).json({
+            status: 200,
+            data: usersDB
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Error al obtener los usuarios"
+        });
+    }
 };
