@@ -30,3 +30,7 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Re
 
   
 }
+
+export const getArtifacts = (req: Request, res: Response) => {
+  return res.status(200).json(artifactInventory);
+}
