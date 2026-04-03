@@ -1,6 +1,6 @@
 import z from 'zod'
 
-const roleEnum = z.enum([
+export const roleEnum = z.enum([
   'Administrador',
   'Director de Innovacion',
   'Expreto en tecnologia extraterrestre',
