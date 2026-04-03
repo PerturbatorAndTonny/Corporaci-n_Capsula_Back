@@ -27,8 +27,9 @@ export const createUser = (req: Request<{}, {}, UserCreate>, res: Response) => {
             state: true,
             failed_attempts: 0,
             createdAt: new Date().toISOString(),
+            pass
         };
-        usersDB.push(newUser, pass);
+        usersDB.push(newUser);
 
         res.status(201).json({
             status: 201,

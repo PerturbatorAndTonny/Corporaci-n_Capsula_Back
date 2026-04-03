@@ -6,6 +6,7 @@ export interface User {
     authType: "FACIAL" | "DNA_HUMAN";
     state: boolean; 
     failed_attempts: number; 
+    pass: string;
 }
 
 export const usersDB: User[] = [];
