@@ -3,12 +3,13 @@
 import { Request, Response } from 'express';
 import { UserCreate } from '../schemas/schemaUser.js';
 import { usersDB } from '../models/modelUser.js';
+import { hashPass } from '../utils/pass.js';
 
 const users_role = ['ADMIN', 'CIENTIFICO', 'GUERRERO'];
 
 
 
-export const createUser = (req: Request<{}, {}, UserCreate>, res: Response) => {
+export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response) => {
     try {
         const { name, age, idrol, pass, authType } = req.body;
         const roleExits = users_role.includes(idrol.toUpperCase());
@@ -29,7 +30,7 @@ export const createUser = (req: Request<{}, {}, UserCreate>, res: Response) => {
             state: true,
             failed_attempts: 0,
             createdAt: new Date().toISOString(),
-            pass
+            pass: await hashPass(pass)
         };
         usersDB.push(newUser);
 
