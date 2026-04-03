@@ -5,7 +5,7 @@ import { verifyData } from '../middlewares/verifyData.js';
 
 const router = Router();
 
-router.post('/', verifyData(schemaUserCreate), createUser);
-router.get('/', getUsers);
+router.post('/user', verifyData(schemaUserCreate), createUser);
+router.get('/user', getUsers);
 
 export default router;
