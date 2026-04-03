@@ -9,6 +9,9 @@ export const newSession = async (req: Request, res: Response) => {
   try {
     // oxlint-disable-next-line no-unused-vars
     const { userId, password, authHash } = req.body as AuthInput;
+    // userId es cambiable por email (no afecta el flujo)
+    // authHash depende del metodo de autheticacion que tenga el user
+    // al implementarlo, sigue la logica del password
 
     const isUserExist = usersDB.find(
       (User) => User.id === Number(userId)
