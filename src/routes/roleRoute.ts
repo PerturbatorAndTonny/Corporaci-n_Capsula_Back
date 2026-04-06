@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { updateUserRole } from "../controllers/role.js";
+import { updateUserRole } from "../controllers/roleController.js";
 import { verifyData } from '../middlewares/verifyData.js'
 import { rolSchema } from '../schemas/role.js'
 import { verifyRole, verifyToken } from "../middlewares/verifyToken.js"

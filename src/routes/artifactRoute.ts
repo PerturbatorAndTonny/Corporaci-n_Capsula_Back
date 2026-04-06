@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createArtifact, getArtifacts } from '../controllers/artifacts.js';
+import { createArtifact, getArtifacts } from '../controllers/artifactController.js';
 import { verifyData } from '../middlewares/verifyData.js';
 import { createArtifactSchema } from '../schemas/artifacts.js';
 

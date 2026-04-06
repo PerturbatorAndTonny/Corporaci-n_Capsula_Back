@@ -4,9 +4,9 @@ import cookieParser from "cookie-parser";
 import type { Request, Response, NextFunction } from "express";
 
 import userRoute from "./routes/userRoute.js";
-import artifactRoutes from "./routes/artifacts.js";
-import authRoute from "./routes/session.js"
-import roleRoute from "./routes/role.js"
+import artifactRoutes from "./routes/artifactRoute.js";
+import authRoute from "./routes/sessionRoute.js"
+import roleRoute from "./routes/roleRoute.js"
 
 const app = express();
 
