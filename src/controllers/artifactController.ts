@@ -1,10 +1,10 @@
 
 import { Request, Response } from 'express';
-import { CreateArtifactInput } from '../schemas/artifacts.js';
-import { artifactInventory, Artifact } from '../models/modelArtifact.js';
+import { CreateArtifactInput } from '../schemas/artifactsSchema.js';
+import { artifactInventory, Artifact } from '../models/artifactModel.js';
 
 // oxlint-disable-next-line typescript/ban-types
-export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
+export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: Response) => {
   const artifactData = req.body;
   const existingArtifact = artifactInventory.find(
     (artifact) => artifact.code === artifactData.code
@@ -23,12 +23,12 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Re
 
   artifactInventory.push(newArtifact);
 
- return res.status(201).json({
+  return res.status(201).json({
     message: 'Artifact created successfully',
     data: newArtifact
   })
 
-  
+
 }
 
 export const getArtifacts = (req: Request, res: Response) => {

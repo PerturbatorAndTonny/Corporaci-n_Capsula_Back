@@ -1,8 +1,8 @@
 // oxlint-disable typescript/ban-types
 // oxlint-disable no-unused-vars
 import { Request, Response } from 'express';
-import { UserCreate } from '../schemas/schemaUser.js';
-import { usersDB } from '../models/modelUser.js';
+import { UserCreate } from '../schemas/userSchema.js';
+import { usersDB } from '../models/userModel.js';
 import { hashPass } from '../utils/pass.js';
 
 export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response) => {

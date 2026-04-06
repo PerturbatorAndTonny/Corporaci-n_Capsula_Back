@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { createSession } from "../utils/session.js";
-import type { AuthInput } from "../schemas/auth.js";
-import { usersDB } from "../models/modelUser.js";
+import type { AuthInput } from "../schemas/authSchema.js";
+import { usersDB } from "../models/userModel.js";
 
 import { comparePass } from "../utils/pass.js";
 

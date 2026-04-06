@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createUser, getUsers } from '../controllers/userController.js';
-import { schemaUserCreate } from '../schemas/schemaUser.js';
+import { schemaUserCreate } from '../schemas/userSchema.js';
 import { verifyData } from '../middlewares/verifyData.js';
 
 const router = Router();

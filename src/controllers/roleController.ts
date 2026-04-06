@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import type { rolType } from "../schemas/role.js";
+import type { rolType } from "../schemas/roleSchema.js";
 
-import { usersDB } from "../models/modelUser.js"; 
+import { usersDB } from "../models/userModel.js";
 
 export const updateUserRole = (req: Request, res: Response) => {
   try {
@@ -22,7 +22,7 @@ export const updateUserRole = (req: Request, res: Response) => {
 
     return res.status(200).json({
       message: `User with id ${id} has been updated to role ${role}`
-    })  
+    })
   } catch (error) {
     return res.status(500).json({
       message: error,
