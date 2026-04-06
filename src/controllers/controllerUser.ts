@@ -5,27 +5,15 @@ import { UserCreate } from '../schemas/schemaUser.js';
 import { usersDB } from '../models/modelUser.js';
 import { hashPass } from '../utils/pass.js';
 
-const users_role = ['ADMIN', 'CIENTIFICO', 'GUERRERO'];
-
-
-
 export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response) => {
     try {
         const { name, age, idrol, pass, authType } = req.body;
-        const roleExits = users_role.includes(idrol.toUpperCase());
-
-        if (!roleExits) {
-            return res.status(400).json({
-                status: 400,
-                message: `El rol ${idrol} no es válido. Los roles válidos son: ${users_role.join(', ')}`
-            });
-        }
 
         const newUser = {
             id: usersDB.length + 1,
             name,
             age,
-            idrol: idrol.toUpperCase(),
+            idrol: idrol,
             authType,
             state: true,
             failed_attempts: 0,

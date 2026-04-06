@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { roleEnum } from './role.js';
 
 export const AuthTypeEnum = z.enum(["FACIAL", "DNA_HUMAN"], {
     error: "El tipo de auth debe ser FACIAL o DNA_HUMAN"
@@ -13,9 +14,7 @@ export const schemaUserCreate = z.object({
         error: "La edad es requerida",
     }).int("La edad debe ser un número entero").positive("La edad debe ser un número positivo"),
 
-    idrol: z.string({
-        error: "El idrol es requerido",
-    }),
+    idrol: roleEnum,
 
     pass: z.string({
         error: "La contraseña es requerida",
