@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import { CreateArtifactInput } from '../schemas/artifacts.js';
 import { artifactInventory, Artifact } from '../models/artifacts.js';
+import { PatchArtifactInput } from '../schemas/patchArtifactSchema.js';
 
 // oxlint-disable-next-line typescript/ban-types
 export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
@@ -33,4 +34,28 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Re
 
 export const getArtifacts = (req: Request, res: Response) => {
   return res.status(200).json(artifactInventory);
+}
+
+export const patchArtifacts = (  req: Request<{ id: string }, {}, PatchArtifactInput>,res: Response) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  const artifactIndex = artifactInventory.findIndex(
+    (artifact) => artifact.id === id
+  );
+
+  if (artifactIndex == -1){
+    return res.status(404).json({message: 'Artifact not found'})
+  }
+
+  const currentArtifact = artifactInventory[artifactIndex];
+
+    const updatedArtifact = {...currentArtifact, ...updates};
+
+  artifactInventory[artifactIndex] = updatedArtifact;
+
+  return res.status(200).json({
+    message: 'Artifact updated successfully',
+    data: updatedArtifact
+  });
 }
