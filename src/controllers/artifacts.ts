@@ -1,8 +1,7 @@
 
 import { Request, Response } from 'express';
-import { CreateArtifactInput } from '../schemas/artifacts.js';
+import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifacts.js';
 import { artifactInventory, Artifact } from '../models/artifacts.js';
-import { PatchArtifactInput } from '../schemas/Artifacts.js';
 
 // oxlint-disable-next-line typescript/ban-types
 export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
@@ -44,7 +43,7 @@ export const patchArtifacts = (  req: Request<{ id: string }, {}, PatchArtifactI
     (artifact) => artifact.id === id
   );
 
-  if (artifactIndex == -1){
+  if (artifactIndex === -1){
     return res.status(404).json({message: 'Artifact not found'})
   }
 
