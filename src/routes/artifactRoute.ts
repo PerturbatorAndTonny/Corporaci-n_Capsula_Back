@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createArtifact, getArtifacts, patchArtifacts } from '../controllers/artifacts.js';
+import { createArtifact, getArtifacts, patchArtifacts } from '../controllers/artifactController.js';
 import { verifyData } from '../middlewares/verifyData.js';
-import { createArtifactSchema, patchArtifactSchema  } from '../schemas/artifacts.js';
+import { createArtifactSchema, patchArtifactSchema  } from '../schemas/artifactsSchema.js';
 
 
 const router = Router();
