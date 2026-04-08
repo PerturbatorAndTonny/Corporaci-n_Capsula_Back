@@ -7,5 +7,5 @@ const router = Router();
 
 router.post('/user', verifyData(schemaUserCreate), createUser);
 router.get('/user', getUsers);
-router.patch('/:id/deactivate', deactivateArtifact);
+router.patch('/artifacts/:id/deactivate', deactivateArtifact);
 export default router;
