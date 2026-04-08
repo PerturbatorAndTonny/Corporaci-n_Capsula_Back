@@ -1,7 +1,6 @@
-
 import { Request, Response } from 'express';
-import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifacts.js';
-import { artifactInventory, Artifact } from '../models/artifacts.js';
+import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifactsSchema.js';
+import { artifactInventory, Artifact } from '../models/artifactModel.js';
 
 // oxlint-disable-next-line typescript/ban-types
 export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: Response) => {
