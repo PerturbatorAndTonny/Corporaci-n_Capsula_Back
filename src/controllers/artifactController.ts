@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifactsSchema.js';
+import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifactSchema.js';
 import { artifactInventory, Artifact } from '../models/artifactModel.js';
 
 // oxlint-disable-next-line typescript/ban-types
@@ -34,7 +34,7 @@ export const getArtifacts = (req: Request, res: Response) => {
   return res.status(200).json(artifactInventory);
 }
 
-export const patchArtifacts = (  req: Request<{ id: string }, {}, PatchArtifactInput>,res: Response) => {
+export const patchArtifacts = (req: Request<{ id: string }, {}, PatchArtifactInput>, res: Response) => {
   const { id } = req.params;
   const updates = req.body;
 
@@ -42,13 +42,13 @@ export const patchArtifacts = (  req: Request<{ id: string }, {}, PatchArtifactI
     (artifact) => artifact.id === id
   );
 
-  if (artifactIndex === -1){
-    return res.status(404).json({message: 'Artifact not found'})
+  if (artifactIndex === -1) {
+    return res.status(404).json({ message: 'Artifact not found' })
   }
 
   const currentArtifact = artifactInventory[artifactIndex];
 
-    const updatedArtifact = {...currentArtifact, ...updates};
+  const updatedArtifact = { ...currentArtifact, ...updates };
 
   artifactInventory[artifactIndex] = updatedArtifact;
 
