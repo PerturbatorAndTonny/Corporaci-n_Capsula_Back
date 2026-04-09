@@ -46,3 +46,15 @@ export const newSession = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const closeSession = (req: Request, res: Response) => {
+  try {
+    res.clearCookie("token").json({
+      message: "Session closed successfully"
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: error,
+    })
+  }
+}
