@@ -1,3 +1,5 @@
+// oxlint-disable no-console
+// oxlint-disable no-unused-vars
 import { sql } from '../utils/conection.js'
 
 async function getAllArtifacts() {
