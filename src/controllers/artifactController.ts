@@ -57,3 +57,43 @@ export const patchArtifacts = (req: Request<{ id: string }, {}, PatchArtifactInp
     data: updatedArtifact
   });
 }
+
+export const deactivateArtifact = (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+     
+        const artifact = artifactInventory.find(a => a.id === id);
+
+        if (!artifact) {
+            return res.status(404).json({
+                status: 404,
+                message: "El artefacto no existe en el sistema"
+            });
+        }
+
+   
+        if (artifact.state === 'Inactivo') {
+            return res.status(400).json({
+                status: 400,
+                message: "El artefacto ya se encuentra en estado Inactivo"
+            });
+        }
+
+     
+        artifact.state = 'Inactivo';
+
+      
+        return res.status(200).json({
+            status: 200,
+            message: "Artefacto desactivado exitosamente",
+            data: artifact
+        });
+
+    // oxlint-disable-next-line no-unused-vars
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Error interno al procesar la desactivación"
+        });
+    }
+};

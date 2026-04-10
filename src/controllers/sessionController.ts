@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { createSession } from "../utils/session.js";
-import type { AuthInput } from "../schemas/authSchema.js";
-import { usersDB } from "../models/userModel.js";
+import { createSession, addToBlacklist } from "../utils/session.js";
+import type { AuthInput } from "../schemas/auth.js";
+import { usersDB } from "../models/modelUser.js";
 
 import { comparePass } from "../utils/pass.js";
 
@@ -40,6 +40,23 @@ export const newSession = async (req: Request, res: Response) => {
       session: token
     })
 
+  } catch (error) {
+    return res.status(500).json({
+      message: error,
+    })
+  }
+}
+
+export const closeSession = (req: Request, res: Response) => {
+  try {
+
+    const { token } = req.cookies
+
+    addToBlacklist(token)
+    
+    res.clearCookie("token").json({
+      message: "Session closed successfully"
+    })
   } catch (error) {
     return res.status(500).json({
       message: error,
