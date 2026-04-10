@@ -59,47 +59,50 @@ export const patchArtifacts = (req: Request<{ id: string }, {}, PatchArtifactInp
   });
 }
 
-export const deactivateArtifact = (req: Request<{ id: string }>, res: Response) => {
-  try {
-    const { id } = req.params;
-    const userRole = req.headers['x-role'];
+export const deactivateArtifact = (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const currentUser = (req as any).user; 
 
-    if (userRole !== 'ADMIN') {
-      return res.status(403).json({
-        status: 403,
-        message: "Acceso denegado. Se requieren permisos de Administrador."
-      });
+        if (!currentUser || currentUser.idrol !== 'ADMIN') {
+            return res.status(403).json({
+                status: 403,
+                message: "Solo un usuario con rol Administrador puede realizar esta operación"
+            });
+        }
+
+     
+        const artifact = artifactInventory.find(a => a.id === id);
+
+        if (!artifact) {
+            return res.status(404).json({
+                status: 404,
+                message: "El artefacto no existe en el sistema"
+            });
+        }
+
+   
+        if (artifact.state === 'Inactivo') {
+            return res.status(400).json({
+                status: 400,
+                message: "El artefacto ya se encuentra en estado Inactivo"
+            });
+        }
+
+     
+        artifact.state = 'Inactivo';
+
+      
+        return res.status(200).json({
+            status: 200,
+            message: "Artefacto desactivado exitosamente",
+            data: artifact
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Error interno al procesar la desactivación"
+        });
     }
-
-    const artifact = artifactInventory.find(a => a.id === id);
-
-    if (!artifact) {
-      return res.status(404).json({
-        status: 404,
-        message: "Artefacto no encontrado"
-      });
-    }
-
-
-    if (artifact.state === 'Inactivo') {
-      return res.status(400).json({
-        status: 400,
-        message: "El artefacto ya se encuentra en estado Inactivo"
-      });
-    }
-
-    artifact.state = 'Inactivo';
-
-    return res.status(200).json({
-      status: 200,
-      message: "Artefacto desactivado correctamente",
-      data: artifact
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      message: "Error interno al desactivar el artefacto"
-    });
-  }
 };
