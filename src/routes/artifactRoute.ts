@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createArtifact, deactivateArtifact, getArtifacts, patchArtifacts } from '../controllers/artifacts.js';
+import { createArtifact, deactivateArtifact, getArtifacts, patchArtifacts } from '../controllers/artifactController.js';
 import { verifyData } from '../middlewares/verifyData.js';
-import { createArtifactSchema, patchArtifactSchema  } from '../schemas/artifacts.js';
+import { createArtifactSchema, patchArtifactSchema  } from '../schemas/artifactSchema.js';
 import { verifyRole, verifyToken } from '../middlewares/verifyToken.js';
 
 
