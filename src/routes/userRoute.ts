@@ -7,5 +7,4 @@ const router = Router();
 
 router.post('/user', verifyData(schemaUserCreate), createUser);
 router.get('/user', getUsers);
-
 export default router;
