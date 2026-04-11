@@ -14,7 +14,7 @@ export interface Artifact {
 
 
 export async function getAllArtifacts(): Promise<Artifact[]> {
-  const result = await sql`SELECT * FROM artefacto`;
+  const result = await sql`SELECT * FROM artefacto ORDER BY id_artefacto ASC`;
   console.log(result) //verificar resultados
   return result as Artifact[];
 }
@@ -91,6 +91,7 @@ export async function deleteArtifact(id: number) {
     UPDATE artefacto
     SET estado = ${false}
     WHERE id_artefacto = ${id}
+    AND estado = true
     RETURNING id_artefacto, nombre_artefacto, estado, fecha_creacion;
   `;
 
