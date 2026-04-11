@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-export const categoryEnum = z.enum([
-  'DEFENSE',
-  'TRANSPORT',
-  'DOMESTIC',
-  'ENERGY'
+export const categoryEnum = z.union([
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
 ]);
 
 export const originEnum = z.enum([
@@ -29,24 +29,24 @@ export const confidentialityEnum = z.enum([
 ]);
 
 export const createArtifactSchema = z.object({
-  nombre_Artefacto: z.string().min(1, 'Name is required'),
+  nombre_artefacto: z.string().min(1, 'Name is required'),
   descripcion: z.string().min(1, 'Description is required'),
   fecha_creacion: z.string().regex(
-    /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/,
-    "Formato debe ser dd/mm/yyyy").min(1, 'Creation date is required'),
-  id_tipo: z.string().min(1, 'Artifact type is required'),
+  /^\d{4}-\d{2}-\d{2}$/,
+  "Formato debe ser YYYY-MM-DD").min(1, 'Date is required'),
+  id_tipo: z.number().min(1, 'Artifact type is required'),
   id_categoria: categoryEnum,
   origen: originEnum,
-  id_usuario: z.string().min(1, 'Inventor is required'),
+  //id_usuario: z.string().min(1, 'Inventor is required'),
   nivel_peligrosidad: dangerLevelEnum,
-  confidentialityLevel: confidentialityEnum
+  confidentialityLevel: confidentialityEnum.optional()
 });
 
 export type CreateArtifactInput = z.infer<typeof createArtifactSchema>;
 
 export const patchArtifactSchema = createArtifactSchema
   .pick({
-    nombre_Artefacto: true,
+    nombre_artefacto: true,
     descripcion: true,
     id_categoria: true,
     origen: true,
