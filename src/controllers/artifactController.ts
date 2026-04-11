@@ -1,99 +1,82 @@
 import { Request, Response } from 'express';
 import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifactSchema.js';
-import { artifactInventory, Artifact } from '../models/artifactModel.js';
-
+import * as ArtifactModel from "../models/artifactModel.js";
 
 // oxlint-disable-next-line typescript/ban-types
-export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: Response) => {
-  const artifactData = req.body;
-  const existingArtifact = null
+export const createArtifact = async (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
+  try {
+    const newArtifact = await ArtifactModel.createArtifact(req.body);
 
-  if (existingArtifact) {
-    return res.status(400).json({
-      message: 'Artifact code already exists'
-    })
+    return res.status(201).json({
+      message: "Artifact created successfully",
+      data: newArtifact,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error});
   }
+};
 
-  const newArtifact: Artifact = {
-    id: crypto.randomUUID(),
-    state: true,
-    ...artifactData
+export const getArtifacts = async (req: Request, res: Response) => {
+  try {
+    const artifacts = await ArtifactModel.getAllArtifacts();
+
+    return res.status(200).json(artifacts);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
   }
+};
 
-  artifactInventory.push(newArtifact);
+export const getArtifactById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
-  return res.status(201).json({
-    message: 'Artifact created successfully',
-    data: newArtifact
-  })
+    const artifact = await ArtifactModel.getOneArtifact(Number(id));
 
-
-}
-
-export const getArtifacts = (req: Request, res: Response) => {
-  return res.status(200).json(artifactInventory);
-}
-
-export const patchArtifacts = (req: Request<{ id: string }, {}, PatchArtifactInput>, res: Response) => {
-  const { id } = req.params;
-  const updates = req.body;
-
-  const artifactIndex = artifactInventory.findIndex(
-    (artifact) => artifact.id === id
-  );
-
-  if (artifactIndex === -1) {
-    return res.status(404).json({ message: 'Artifact not found' })
-  }
-
-  const currentArtifact = artifactInventory[artifactIndex];
-
-  const updatedArtifact = { ...currentArtifact, ...updates };
-
-  artifactInventory[artifactIndex] = updatedArtifact;
-
-  return res.status(200).json({
-    message: 'Artifact updated successfully',
-    data: updatedArtifact
-  });
-}
-
-export const deactivateArtifact = (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-     
-        const artifact = artifactInventory.find(a => a.id === id);
-
-        if (!artifact) {
-            return res.status(404).json({
-                status: 404,
-                message: "El artefacto no existe en el sistema"
-            });
-        }
-
-   
-        if (artifact.state === 'Inactivo') {
-            return res.status(400).json({
-                status: 400,
-                message: "El artefacto ya se encuentra en estado Inactivo"
-            });
-        }
-
-     
-        artifact.state = 'Inactivo';
-
-      
-        return res.status(200).json({
-            status: 200,
-            message: "Artefacto desactivado exitosamente",
-            data: artifact
-        });
-
-    // oxlint-disable-next-line no-unused-vars
-    } catch (error) {
-        return res.status(500).json({
-            status: 500,
-            message: "Error interno al procesar la desactivación"
-        });
+    if (!artifact) {
+      return res.status(404).json({ message: "Artifact not found" });
     }
+
+    return res.status(200).json(artifact);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
+  }
+};
+
+export const patchArtifacts = async (req: Request<{ id: string }, {}, PatchArtifactInput>, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const updatedArtifact = await ArtifactModel.updateArtifact(
+      Number(id),
+      req.body
+    );
+
+    if (!updatedArtifact) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
+
+    return res.status(200).json({
+      message: "Artifact updated successfully",
+      data: updatedArtifact,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
+  }
+};
+
+export const deleteArtifact = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const artifact = await ArtifactModel.deleteArtifact(Number(id));
+
+    if (!artifact) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
+ 
+    return res.status(200).json({ message: "Artifact deleted succesfully", data: artifact});
+    
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
+  }
 };
