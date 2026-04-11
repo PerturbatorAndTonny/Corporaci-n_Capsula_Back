@@ -1,21 +1,21 @@
 import type { Request, Response } from "express";
 import { createSession, addToBlacklist } from "../utils/session.js";
-import type { AuthInput } from "../schemas/auth.js";
-import { usersDB } from "../models/modelUser.js";
+import type { AuthInput } from "../schemas/authSchema.js";
+//import { usersDB } from "../models/userModel.js";
+
+import { getUserCredentials, getUserRole } from '../models/sessionModel.js'
 
 import { comparePass } from "../utils/pass.js";
 
 export const newSession = async (req: Request, res: Response) => {
   try {
     // oxlint-disable-next-line no-unused-vars
-    const { userId, password, authHash } = req.body as AuthInput;
+    const { userName, password } = req.body as AuthInput;
     // userId es cambiable por email (no afecta el flujo)
     // authHash depende del metodo de autheticacion que tenga el user
     // al implementarlo, sigue la logica del password
 
-    const isUserExist = usersDB.find(
-      (User) => User.id === Number(userId)
-    )
+    const isUserExist = await getUserCredentials(userName)
 
     if (!isUserExist) {
       return res.status(404).json({
@@ -23,20 +23,21 @@ export const newSession = async (req: Request, res: Response) => {
       })
     }
 
-    const isSame = await comparePass(password, isUserExist.pass)
+    const isSame = await comparePass(password, isUserExist.password)
 
     if (!isSame) {
-      isUserExist.failed_attempts++
       return res.status(401).json({
         messageError: "Invalid credentials, try again"
       })
     }
 
-    const token = await createSession({ role: isUserExist.idrol })
+    const credential = await getUserRole(userName)
+
+    const token = await createSession({ role: credential.nombre_rol })
 
     return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
-      data: isUserExist.idrol,
+      data: credential.nombre_rol,
       session: token
     })
 

@@ -1,18 +1,26 @@
 import express from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import type { Request, Response, NextFunction } from "express";
 
 import userRoute from "./routes/userRoute.js";
-import artifactRoutes from "./routes/artifacts.js";
-import authRoute from "./routes/session.js"
-import roleRoute from "./routes/role.js"
+import artifactRoutes from "./routes/artifactRoute.js";
+import authRoute from "./routes/sessionRoute.js"
+import roleRoute from "./routes/roleRoute.js"
 
 const app = express();
 
 app.use(express.json())
 app.use(morgan("dev"))
 app.use(cookieParser())
+app.use(cors({
+  origin: '*',
+  methods: 'GET, POST, PUT, PATCH, DELETE',
+  preflightContinue: true,
+  optionsSuccessStatus: 204,
+  credentials: true
+}))
 
 app.use('/api/v1', artifactRoutes);
 app.use('/api/v1', userRoute);
