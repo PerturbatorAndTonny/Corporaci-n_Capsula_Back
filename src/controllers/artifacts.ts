@@ -1,60 +1,65 @@
-
-import { Request, Response } from 'express';
-import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifacts.js';
-import { artifactInventory, Artifact } from '../models/artifacts.js';
-
+import { Request, Response } from "express";
+import { CreateArtifactInput, PatchArtifactInput } from "../schemas/artifacts.js";
+import * as ArtifactModel from "../models/artifacts.js";
 
 // oxlint-disable-next-line typescript/ban-types
-export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
-  const artifactData = req.body;
-  const existingArtifact = null
+export const createArtifact = async (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
+  try {
+    const newArtifact = await ArtifactModel.createArtifact(req.body);
 
-  if (existingArtifact) {
-    return res.status(400).json({
-      message: 'Artifact code already exists'
-    })
+    return res.status(201).json({
+      message: "Artifact created successfully",
+      data: newArtifact,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error});
   }
+};
 
-  const newArtifact: Artifact = {
-    id: crypto.randomUUID(),
-    state: true,
-    ...artifactData
+export const getArtifacts = async (req: Request, res: Response) => {
+  try {
+    const artifacts = await ArtifactModel.getAllArtifacts();
+
+    return res.status(200).json(artifacts);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
   }
+};
 
-  artifactInventory.push(newArtifact);
+export const getArtifactById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
- return res.status(201).json({
-    message: 'Artifact created successfully',
-    data: newArtifact
-  })
+    const artifact = await ArtifactModel.getOneArtifact(Number(id));
 
-  
-}
+    if (!artifact) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
 
-export const getArtifacts = (req: Request, res: Response) => {
-  return res.status(200).json(artifactInventory);
-}
-
-export const patchArtifacts = (  req: Request<{ id: string }, {}, PatchArtifactInput>,res: Response) => {
-  const { id } = req.params;
-  const updates = req.body;
-
-  const artifactIndex = artifactInventory.findIndex(
-    (artifact) => artifact.id === id
-  );
-
-  if (artifactIndex == -1){
-    return res.status(404).json({message: 'Artifact not found'})
+    return res.status(200).json(artifact);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
   }
+};
 
-  const currentArtifact = artifactInventory[artifactIndex];
+export const patchArtifacts = async (req: Request<{ id: string }, {}, PatchArtifactInput>, res: Response) => {
+  try {
+    const { id } = req.params;
 
-    const updatedArtifact = {...currentArtifact, ...updates};
+    const updatedArtifact = await ArtifactModel.updateArtifact(
+      Number(id),
+      req.body
+    );
 
-  artifactInventory[artifactIndex] = updatedArtifact;
+    if (!updatedArtifact) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
 
-  return res.status(200).json({
-    message: 'Artifact updated successfully',
-    data: updatedArtifact
-  });
-}
+    return res.status(200).json({
+      message: "Artifact updated successfully",
+      data: updatedArtifact,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
+  }
+};
