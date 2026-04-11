@@ -3,12 +3,11 @@ import { Request, Response } from 'express';
 import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifacts.js';
 import { artifactInventory, Artifact } from '../models/artifacts.js';
 
+
 // oxlint-disable-next-line typescript/ban-types
 export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: Response) => {
   const artifactData = req.body;
-  const existingArtifact = artifactInventory.find(
-    (artifact) => artifact.code === artifactData.code
-  )
+  const existingArtifact = null
 
   if (existingArtifact) {
     return res.status(400).json({
@@ -18,6 +17,7 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: R
 
   const newArtifact: Artifact = {
     id: crypto.randomUUID(),
+    state: true,
     ...artifactData
   }
 
