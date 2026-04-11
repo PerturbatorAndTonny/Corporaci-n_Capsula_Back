@@ -63,3 +63,20 @@ export const patchArtifacts = async (req: Request<{ id: string }, {}, PatchArtif
     return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
   }
 };
+
+export const deleteArtifact = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const artifact = await ArtifactModel.deleteArtifact(Number(id));
+
+    if (!artifact) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
+ 
+    return res.status(200).json({ message: "Artifact deleted succesfully", data: artifact});
+    
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
+  }
+};
