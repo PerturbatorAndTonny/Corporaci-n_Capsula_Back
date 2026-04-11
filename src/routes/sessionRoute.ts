@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { newSession } from "../controllers/session.js";
+import { newSession } from "../controllers/sessionController.js";
 import { verifyData } from "../middlewares/verifyData.js"
-import { authSchema } from "../schemas/auth.js";
+import { authSchema } from "../schemas/authSchema.js";
 
 const router: Router = Router();
 

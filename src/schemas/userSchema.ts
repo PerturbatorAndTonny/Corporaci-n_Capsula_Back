@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { roleEnum } from './role.js';
+import { roleEnum } from './roleSchema.js';
 
 export const AuthTypeEnum = z.enum(["FACIAL", "DNA_HUMAN"], {
     error: "El tipo de auth debe ser FACIAL o DNA_HUMAN"

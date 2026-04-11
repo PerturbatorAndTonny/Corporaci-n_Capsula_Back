@@ -11,4 +11,14 @@ export async function createSession (payload: jwtPayload): Promise<unknown> {
       resolve(token as string)
     })
   })
-} 
+}
+
+const blackList = new Set<string>()
+
+export function addToBlacklist(token: string): void {
+  blackList.add(token)
+}
+
+export function isBlacklisted(token: string): boolean {
+  return blackList.has(token)
+}

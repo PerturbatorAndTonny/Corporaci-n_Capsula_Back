@@ -1,14 +1,12 @@
-
 import { Request, Response } from 'express';
-import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifacts.js';
-import { artifactInventory, Artifact } from '../models/artifacts.js';
+import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifactSchema.js';
+import { artifactInventory, Artifact } from '../models/artifactModel.js';
+
 
 // oxlint-disable-next-line typescript/ban-types
 export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: Response) => {
   const artifactData = req.body;
-  const existingArtifact = artifactInventory.find(
-    (artifact) => artifact.code === artifactData.code
-  )
+  const existingArtifact = null
 
   if (existingArtifact) {
     return res.status(400).json({
@@ -18,6 +16,7 @@ export const createArtifact = (req: Request<{}, {}, CreateArtifactInput>, res: R
 
   const newArtifact: Artifact = {
     id: crypto.randomUUID(),
+    state: true,
     ...artifactData
   }
 
@@ -62,15 +61,6 @@ export const patchArtifacts = (req: Request<{ id: string }, {}, PatchArtifactInp
 export const deactivateArtifact = (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const currentUser = (req as any).user; 
-
-        if (!currentUser || currentUser.idrol !== 'ADMIN') {
-            return res.status(403).json({
-                status: 403,
-                message: "Solo un usuario con rol Administrador puede realizar esta operación"
-            });
-        }
-
      
         const artifact = artifactInventory.find(a => a.id === id);
 
@@ -99,6 +89,7 @@ export const deactivateArtifact = (req: Request, res: Response) => {
             data: artifact
         });
 
+    // oxlint-disable-next-line no-unused-vars
     } catch (error) {
         return res.status(500).json({
             status: 500,

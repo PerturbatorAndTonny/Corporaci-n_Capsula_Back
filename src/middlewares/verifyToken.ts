@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import type { jwtPayload } from '../types/index.js'
+import { isBlacklisted } from '../utils/session.js'
 
 const secret = process.env.JWT_SECRET as string
 
@@ -9,6 +10,11 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
   if (!token) {
     res.status(401).json({ error: "Token requerido" });
+    return;
+  }
+
+  if (isBlacklisted(token)) {
+    res.status(401).json({ error: "Token inválido o expirado" });
     return;
   }
 
