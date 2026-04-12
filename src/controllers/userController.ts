@@ -51,10 +51,10 @@ export const getUsers = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserByName = async (req: Request<{ nombre: string }>, res: Response) => {
+export const getUserByName = async (req: Request<{ id: number }>, res: Response) => {
     try {
-        const { nombre } = req.params;
-        const user = await userModel.getUserByName(nombre);
+        const { id } = req.params;
+        const user = await userModel.getUserById(id);
         if (!user) {
             return res.status(404).json({
                 status: 404,
@@ -73,17 +73,16 @@ export const getUserByName = async (req: Request<{ nombre: string }>, res: Respo
     }
 };
 
-export const updateUserByName = async (req: Request<{ nombre: string }, {}, UserUpdate>, res: Response) => {
+export const updateUserByName = async (req: Request<{ id: string }, {}, UserUpdate>, res: Response) => {
     try {
-        const { nombre } = req.params;
+        const { id } = req.params;
         const updates = req.body;
 
-     
         if (updates.contraseña) {
             updates.contraseña = await hashPass(updates.contraseña);
         }
 
-        const updatedUser = await userModel.updateUserByName(nombre, updates);
+        const updatedUser = await userModel.updateUserById(Number(id), updates);
         if (!updatedUser) {
             return res.status(404).json({
                 status: 404,
@@ -103,10 +102,10 @@ export const updateUserByName = async (req: Request<{ nombre: string }, {}, User
     }
 };
 
-export const deleteUserByName = async (req: Request<{ nombre: string }>, res: Response) => {
+export const deleteUserByName = async (req: Request<{ id: number }>, res: Response) => {
     try {
-        const { nombre } = req.params;
-        const deleted = await userModel.deleteUserByName(nombre);
+        const { id } = req.params;
+        const deleted = await userModel.deleteUserById(id);
         if (!deleted) {
             return res.status(404).json({
                 status: 404,
