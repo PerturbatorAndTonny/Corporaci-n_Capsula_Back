@@ -26,7 +26,7 @@ export async function getUsers() {
 }
 
 
-export async function updateUserByName(name: string, updates: Partial<User>) {
+export async function updateUserById(id: number, updates: Partial<User>) {
     const result = await sql`
         UPDATE usuario
         SET
@@ -35,28 +35,29 @@ export async function updateUserByName(name: string, updates: Partial<User>) {
             password = COALESCE(${updates.contraseña}, password),
             adn = COALESCE(${updates.ADN}, adn),
             biometria = COALESCE(${updates.biometria}, biometria)
-        WHERE nombre = ${name}
+        WHERE id_usuario = ${id}
         RETURNING nombre, edad, password as contraseña, adn as ADN, biometria
     `;
     return result[0] as User;
 }
 
-export async function getUserByName(name: string) {
+export async function getUserById(id: number) {
     const result = await sql`
         SELECT nombre, edad, password as contraseña, adn as ADN, biometria
         FROM usuario
-        WHERE nombre = ${name}
+        WHERE id_usuario = ${id}
     `;
     return result[0] as User | undefined;
 }
 
-export async function deleteUserByName(name: string) {
+export async function deleteUserById(id: number) {
     const result = await sql`
-        DELETE FROM usuario
-        WHERE nombre = ${name}
-        RETURNING nombre
+        UPDATE usuario 
+        SET estado = false 
+        WHERE id_usuario = ${id} 
+        RETURNING nombre, estado
     `;
-    return result[0] ? true : false;
+    return result[0];
 }
 
 export async function userExist(id: number) {
