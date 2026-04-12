@@ -51,7 +51,7 @@ export const getUsers = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserByName = async (req: Request<{ id: number }>, res: Response) => {
+export const getUserById= async (req: Request<{ id: number }>, res: Response) => {
     try {
         const { id } = req.params;
         const user = await userModel.getUserById(id);
@@ -73,7 +73,7 @@ export const getUserByName = async (req: Request<{ id: number }>, res: Response)
     }
 };
 
-export const updateUserByName = async (req: Request<{ id: string }, {}, UserUpdate>, res: Response) => {
+export const updateUserById = async (req: Request<{ id: string }, {}, UserUpdate>, res: Response) => {
     try {
         const { id } = req.params;
         const updates = req.body;
@@ -102,7 +102,7 @@ export const updateUserByName = async (req: Request<{ id: string }, {}, UserUpda
     }
 };
 
-export const deleteUserByName = async (req: Request<{ id: number }>, res: Response) => {
+export const deleteUserById = async (req: Request<{ id: number }>, res: Response) => {
     try {
         const { id } = req.params;
         const deleted = await userModel.deleteUserById(id);
