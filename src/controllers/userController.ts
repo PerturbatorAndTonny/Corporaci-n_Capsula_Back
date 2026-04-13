@@ -20,7 +20,7 @@ export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response
             ADN,
             contraseña: await hashPass(contraseña),
             biometria
-    }, rol || 7); // Use provided role or default to "Usuario" (7)
+    }, rol || 7);
 
         res.status(201).json({
             status: 201,

@@ -8,7 +8,7 @@ export interface User {
     contraseña: string;
 }
 
-export async function createUser(user: User, idRol: number = 7) {  // Default to "Usuario" role (id=7)
+export async function createUser(user: User, idRol: number = 7) {
     const result = await sql`
         INSERT INTO usuario (nombre, edad, password, adn, biometria)
         VALUES (${user.nombre}, ${user.edad}, ${user.contraseña}, ${user.ADN}, ${user.biometria}, ${idRol})
