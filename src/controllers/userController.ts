@@ -10,7 +10,7 @@ const generateBiometria = () => Array.from({ length: 24 }, () => Math.floor(Math
 
 export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response) => {
     try {
-        const { nombre, edad, contraseña } = req.body;
+        const { nombre, edad, contraseña, rol } = req.body;
         const ADN = generateADN();
         const biometria = generateBiometria();
 
@@ -20,7 +20,7 @@ export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response
             ADN,
             contraseña: await hashPass(contraseña),
             biometria
-        });
+    }, rol || 7); // Use provided role or default to "Usuario" (7)
 
         res.status(201).json({
             status: 201,
