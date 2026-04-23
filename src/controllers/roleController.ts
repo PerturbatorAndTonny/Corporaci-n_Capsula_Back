@@ -17,6 +17,12 @@ export const updateUserRole = async (req: Request, res: Response) => {
       })
     }
 
+    if (isUserExist.id_usuario === Number(id)){
+      return res.status(400).json({
+        message: "El rol a cambiar es el mismo que vas a asignar"
+      })
+    }
+
     const userRolUpdate = await modifyUserRol(Number(id), role)
 
     return res.status(200).json({
