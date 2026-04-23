@@ -6,7 +6,7 @@ import { verifyRole, verifyToken } from "../middlewares/verifyToken.js"
 
 const router: Router = Router();
 
-router.get("/users/roles", getUsersByRol)
+router.get("/users/roles", verifyToken, verifyRole("Administrador"), getUsersByRol)
 router.patch("/users/:id/role", verifyToken, verifyRole("Administrador"), verifyData(rolSchema), updateUserRole);
 
 export default router; 
