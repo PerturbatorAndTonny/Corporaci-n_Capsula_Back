@@ -36,9 +36,40 @@ export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response
     }
 };
 
-export const getUsers = async (req: Request, res: Response) => {
+// Diccionario para traducir el texto de la URL al ID de tu base de datos
+const ROLE_MAP: Record<string, number> = {
+    'ADMIN': 1,
+    'DIRECTOR_INNOVACION': 2,
+    'EXPERTO_EXTRATERRESTRE': 3,
+    'ESPECIALISTA_SEGURIDAD': 4,
+    'INVENTOR_TESTER': 5,
+    'GESTOR_PROYECTOS': 6,
+    'USUARIO': 7
+};
+
+// Se añade el tipado estricto en el Request para leer el query param "role"
+export const getUsers = async (req: Request<{}, {}, {}, { role?: string }>, res: Response) => {
     try {
-        const users = await userModel.getUsers();
+        const { role } = req.query;
+        let roleId: number | undefined;
+
+        // Validar si enviaron un rol por la URL
+        if (role) {
+            const roleUpper = role.toUpperCase(); // Para evitar errores si escriben en minúscula
+            roleId = ROLE_MAP[roleUpper];
+
+            // Si el rol no existe en nuestro diccionario, devolvemos error 400 (Criterio de aceptación)
+            if (!roleId) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Rol inválido. Roles permitidos: ADMIN, DIRECTOR_INNOVACION, EXPERTO_EXTRATERRESTRE, ESPECIALISTA_SEGURIDAD, INVENTOR_TESTER, GESTOR_PROYECTOS, USUARIO"
+                });
+            }
+        }
+
+        // Llamamos al modelo pasando el ID numérico (o undefined si no enviaron nada)
+        const users = await userModel.getUsers(roleId);
+        
         return res.status(200).json({
             status: 200,
             data: users
