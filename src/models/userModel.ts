@@ -50,6 +50,13 @@ export async function getUserById(id: number) {
     return result[0] as User | undefined;
 }
 
+export async function getUserByName(nombre: string) {
+    const result = await sql`
+        SELECT * FROM usuario WHERE nombre = ${nombre}
+    `;
+    return result[0];
+}
+
 export async function deleteUserById(id: number) {
     const result = await sql`
         UPDATE usuario 
