@@ -15,14 +15,14 @@ export interface Artifact {
 
 export async function getAllArtifacts(): Promise<Artifact[]> {
   const result = await sql`SELECT * FROM artefacto ORDER BY id_artefacto ASC`;
-  console.log(result) //verificar resultados
+  //console.log(result) verificar resultados
   return result as Artifact[];
 }
 
 export async function getOneArtifact(id: number): Promise<Artifact | null> {
   const result = await sql`
     SELECT * FROM artefacto WHERE id_artefacto = ${id}`;
-    console.log("artifact: ", result)
+   // console.log("artifact: ", result)
   return (result[0] as Artifact) || null;
 }
 
@@ -40,7 +40,7 @@ export async function createArtifact(data: Omit<Artifact, "id_artefacto" | "esta
     )
     RETURNING id_artefacto, nombre_artefacto, estado, fecha_creacion;
   `;
-  console.log("New data created!!!", result) //verificar creacion
+  //console.log("New data created!!!", result) verificar creacion
   return result[0];
 }
 
@@ -81,7 +81,7 @@ export async function updateArtifact(id: number, data: any) {
     RETURNING *
   `;
 
-  console.log("data updated", result)
+  //console.log("data updated", result)
 
   return result[0];
 }
@@ -95,7 +95,7 @@ export async function deleteArtifact(id: number) {
     RETURNING id_artefacto, nombre_artefacto, estado, fecha_creacion;
   `;
 
-  console.log("Data deleted", result)
+  //console.log("Data deleted", result)
 
   return result[0];
 }
