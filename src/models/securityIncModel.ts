@@ -1,9 +1,10 @@
 import { sql } from "../utils/conection.js";
+import {Severidad} from "../utils/securityInc.js"
 
 export const registrarIncidente = async (data: {
   fecha: Date;
   descripcion: string;
-  severidad: String;
+  severidad: Severidad;
   estado: boolean;
   id_usuario: number;
 }): Promise<void> => {
