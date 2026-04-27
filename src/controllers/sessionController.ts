@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createSession, addToBlacklist } from "../utils/session.js";
+import { createSession, addToBlacklist, isBlocked, registerFailedAttempt, resetAttempts } from "../utils/session.js";
 import type { AuthInput } from "../schemas/authSchema.js";
 //import { usersDB } from "../models/userModel.js";
 
@@ -15,6 +15,16 @@ export const newSession = async (req: Request, res: Response) => {
     // authHash depende del metodo de autheticacion que tenga el user
     // al implementarlo, sigue la logica del password
 
+     const blockStatus = isBlocked(userName);
+
+    if (blockStatus.blocked) {
+      return res.status(423).json({
+        messageError: `Cuenta bloqueada. Intenta en ${Math.ceil(
+          blockStatus.remaining / 1000
+        )} segundos`,
+      })
+    }
+
     const isUserExist = await getUserCredentials(userName)
 
     if (!isUserExist) {
@@ -22,14 +32,30 @@ export const newSession = async (req: Request, res: Response) => {
         messageError: "user not found"
       })
     }
+      //Verificar cuenta activa
+      if (!isUserExist.estado) {
+      return res.status(403).json({
+        messageError: "Cuenta inactiva, contacta al administrador",
+      });
+    }
 
-    const isSame = await comparePass(password, isUserExist.password)
+      const isSame = await comparePass(password, isUserExist.password);
 
     if (!isSame) {
+      const attempt = registerFailedAttempt(userName);
+
+      if (attempt.blockedUntil) {
+        return res.status(423).json({
+          messageError: "Cuenta bloqueada por múltiples intentos fallidos",
+        });
+      }
+
       return res.status(401).json({
-        messageError: "Invalid credentials, try again"
-      })
+        messageError: "Invalid credentials, try again",
+      });
     }
+
+    resetAttempts(userName); //Si se inicia sesion de forma correcta, se reinician los intentos
 
     const credential = await getUserRole(userName)
 
