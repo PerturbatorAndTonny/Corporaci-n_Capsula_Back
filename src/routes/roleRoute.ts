@@ -8,5 +8,6 @@ import { incidenteMiddleware } from "../middlewares/incident.js";
 const router: Router = Router();
 
 router.patch("/users/:id/role", verifyToken, verifyRole("Administrador"), verifyData(rolSchema), incidenteMiddleware, updateUserRole)
+router.get("/users/roles", verifyToken, verifyRole("Administrador"), getUsersByRol)
 
 export default router; 
