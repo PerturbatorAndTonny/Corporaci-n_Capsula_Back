@@ -4,6 +4,8 @@ import type { rolType } from "../schemas/roleSchema.js";
 import { userExist, modifyUserRol } from "../models/userModel.js"
 import { getAlluserByRol } from '../models/roleModel.js'
 
+import { registrarAuditoria } from "../utils/audit.js"
+
 export const updateUserRole = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -17,19 +19,27 @@ export const updateUserRole = async (req: Request, res: Response) => {
       })
     }
 
-    if (isUserExist.id_usuario === Number(id)){
+    if (isUserExist.id_usuario === Number(id)) {
       return res.status(400).json({
         message: "No puedes modificar tu propio rol"
       })
     }
 
-    if(isUserExist.id_rol === role) {
+    if (isUserExist.id_rol === role) {
       return res.status(400).json({
         message: "El usuario ya tiene asignado ese rol"
       })
     }
 
     const userRolUpdate = await modifyUserRol(Number(id), role)
+
+    await registrarAuditoria({
+      nombre_tabla: "usuario",
+      accion: 'UPDATE',
+      id_usuario: Number(req.user?.id_usuario),
+      valor_anterior: JSON.stringify({ id_rol: isUserExist.id_rol }),
+      valor_nuevo: JSON.stringify({ id_rol: role }),
+    })
 
     return res.status(200).json({
       message: `user updated`,
