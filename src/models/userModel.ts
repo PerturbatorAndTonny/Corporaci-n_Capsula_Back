@@ -10,19 +10,33 @@ export interface User {
 
 export async function createUser(user: User, idRol: number = 7) {
     const result = await sql`
-        INSERT INTO usuario (nombre, edad, password, adn, biometria)
-        VALUES (${user.nombre}, ${user.edad}, ${user.contraseña}, ${user.ADN}, ${user.biometria}, ${idRol})
+        INSERT INTO usuario (nombre, edad, biometria, adn, password, id_rol)
+        VALUES (${user.nombre}, ${user.edad}, ${user.biometria}, ${user.ADN}, ${user.contraseña}, ${idRol})
         RETURNING nombre, edad, password as contraseña, adn as ADN, biometria , id_rol
     `;
     return result[0] as User & { id_rol: number };
 }
 
-export async function getUsers() {
-    const result = await sql`
-        SELECT nombre, edad, password as contraseña, adn as ADN, biometria
-        FROM usuario
-    `;
-    return result as User[];
+export async function getUsers(roleId?: number) {
+    // Si enviaron un rol específico, filtramos por ese ID
+    if (roleId) {
+        const result = await sql`
+            SELECT u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
+            FROM usuario u
+            JOIN rol r ON u.id_rol = r.id_rol
+            WHERE u.id_rol = ${roleId}
+        `;
+        return result;
+    } 
+    // Si no enviaron rol, devolvemos todos los usuarios
+    else {
+        const result = await sql`
+            SELECT u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
+            FROM usuario u
+            JOIN rol r ON u.id_rol = r.id_rol
+        `;
+        return result;
+    }
 }
 
 
@@ -43,11 +57,19 @@ export async function updateUserById(id: number, updates: Partial<User>) {
 
 export async function getUserById(id: number) {
     const result = await sql`
-        SELECT nombre, edad, password as contraseña, adn as ADN, biometria
-        FROM usuario
-        WHERE id_usuario = ${id}
+        SELECT u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
+        FROM usuario u
+        JOIN rol r ON u.id_rol = r.id_rol
+        WHERE u.id_usuario = ${id}
     `;
-    return result[0] as User | undefined;
+    return result[0];
+}
+
+export async function getUserByName(nombre: string) {
+    const result = await sql`
+        SELECT * FROM usuario WHERE nombre = ${nombre}
+    `;
+    return result[0];
 }
 
 export async function deleteUserById(id: number) {

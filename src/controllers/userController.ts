@@ -8,37 +8,86 @@ import { hashPass } from '../utils/pass.js';
 const generateADN = () => Math.random().toString(36).slice(2, 10).toUpperCase();
 const generateBiometria = () => Array.from({ length: 24 }, () => Math.floor(Math.random() * 10)).join('');
 
-export const createUser = async (req: Request<{}, {}, UserCreate>, res: Response) => {
+// Se añade { authType?: string } al tipado estricto para evitar usar "any"
+export const createUser = async (req: Request<{}, {}, UserCreate & { authType?: string }>, res: Response) => {
     try {
-        const { nombre, edad, contraseña, rol } = req.body;
-        const ADN = generateADN();
+        // 1. Extraemos los datos enviados por el frontend, incluyendo el nuevo authType
+        const { nombre, edad, contraseña, rol, authType } = req.body;
+
+        // 2. VALIDACIÓN DE NOMBRE ÚNICO (Regla de negocio)
+        const existingUser = await userModel.getUserByName(nombre);
+        
+        if (existingUser) {
+            return res.status(409).json({
+                status: 409,
+                message: "Conflicto: Ya existe un usuario registrado con este nombre."
+            });
+        }
+
+        // 3. IDENTIFICACIÓN AUTOMÁTICA DE ESPECIE
+        // Usamos un operador ternario para asignar la especie
+        const especieAsignada = authType === 'DNA_SAIYAN' ? 'Saiyajin' : 'Humano';
+
+        // Mantenemos la generación de biometría que ya tenías
         const biometria = generateBiometria();
 
+        // 4. CREACIÓN DEL USUARIO
         const newUser = await userModel.createUser({
             nombre,
             edad,
-            ADN,
+            ADN: especieAsignada, // Aquí guardamos "Humano" o "Saiyajin"
             contraseña: await hashPass(contraseña),
             biometria
-    }, rol || 7);
+        }, rol || 7);
 
-        res.status(201).json({
+        return res.status(201).json({
             status: 201,
             message: "Usuario creado exitosamente",
             user: newUser
         });
 
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             status: 500,
             message: "Error al crear el usuario"
         });
     }
 };
 
-export const getUsers = async (req: Request, res: Response) => {
+// Diccionario para traducir el texto de la URL al ID de tu base de datos
+const ROLE_MAP: Record<string, number> = {
+    'ADMIN': 1,
+    'DIRECTOR_INNOVACION': 2,
+    'EXPERTO_EXTRATERRESTRE': 3,
+    'ESPECIALISTA_SEGURIDAD': 4,
+    'INVENTOR_TESTER': 5,
+    'GESTOR_PROYECTOS': 6,
+    'USUARIO': 7
+};
+
+// Se añade el tipado estricto en el Request para leer el query param "role"
+export const getUsers = async (req: Request<{}, {}, {}, { role?: string }>, res: Response) => {
     try {
-        const users = await userModel.getUsers();
+        const { role } = req.query;
+        let roleId: number | undefined;
+
+        // Validar si enviaron un rol por la URL
+        if (role) {
+            const roleUpper = role.toUpperCase(); // Para evitar errores si escriben en minúscula
+            roleId = ROLE_MAP[roleUpper];
+
+            // Si el rol no existe en nuestro diccionario, devolvemos error 400 (Criterio de aceptación)
+            if (!roleId) {
+                return res.status(400).json({
+                    status: 400,
+                    message: "Rol inválido. Roles permitidos: ADMIN, DIRECTOR_INNOVACION, EXPERTO_EXTRATERRESTRE, ESPECIALISTA_SEGURIDAD, INVENTOR_TESTER, GESTOR_PROYECTOS, USUARIO"
+                });
+            }
+        }
+
+        // Llamamos al modelo pasando el ID numérico (o undefined si no enviaron nada)
+        const users = await userModel.getUsers(roleId);
+        
         return res.status(200).json({
             status: 200,
             data: users

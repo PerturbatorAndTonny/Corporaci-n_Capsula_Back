@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { CreateArtifactInput, PatchArtifactInput } from '../schemas/artifactSchema.js';
 import * as ArtifactModel from "../models/artifactModel.js";
+import { createVersion, getLastVersion } from "../models/artifactVerModel.js";
+import { getChangedFields, generateNextVersion } from "../utils/artifactVersion.js";
 
 // oxlint-disable-next-line typescript/ban-types
 export const createArtifact = async (req: Request<{}, {}, CreateArtifactInput>,res: Response) => {
@@ -46,19 +48,51 @@ export const patchArtifacts = async (req: Request<{ id: string }, {}, PatchArtif
   try {
     const { id } = req.params;
 
+    //Obtener estado actual
+    const currentArtifact = await ArtifactModel.getOneArtifact(Number(id));
+
+    if (!currentArtifact) {
+      return res.status(404).json({ message: "Artifact not found" });
+    }
+
+    //Actualizar artefacto
     const updatedArtifact = await ArtifactModel.updateArtifact(
       Number(id),
       req.body
     );
 
-    if (!updatedArtifact) {
-      return res.status(404).json({ message: "Artifact not found" });
+     //Detectar cambios
+    const changes = getChangedFields(currentArtifact, req.body);
+
+      //Obtener usuario o por defecto el sistema
+    const autor = (req as any).user?.username || "system";
+
+    // obtener última versión del artefacto
+    const lastVersion = await getLastVersion(Number(id));
+
+    // generar nueva versión
+    const newVersion = generateNextVersion(lastVersion);
+
+    //Crear la version 
+    try {
+      if (changes.length > 0) {
+        await createVersion({
+          id_artefacto: Number(id),
+          numeroversion: newVersion,
+          cambiosrealizados: JSON.stringify(changes),
+          autor,
+          fechacambio: new Date().toISOString().split("T")[0],
+        });
+      }
+    } catch (err) {
+      console.error("Version insert failed:", err);
     }
 
     return res.status(200).json({
       message: "Artifact updated successfully",
       data: updatedArtifact,
     });
+
   } catch (error) {
     return res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : error });
   }
