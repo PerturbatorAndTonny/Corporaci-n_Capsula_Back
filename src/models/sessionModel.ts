@@ -29,7 +29,7 @@ export async function getUserRole(nameUser: string): Promise<userInfo> {
 export async function createSession(idUsuario: number) {
     const result = await sql`
         INSERT INTO sesion (fecha_inicio, estado_sesion, id_usuario)
-        VALUES (CURRENT_TIMESTAMP, true, ${idUsuario})
+        VALUES (CURRENT_TIMESTAMP AT TIME ZONE 'America/Bogota', true, ${idUsuario})
         RETURNING id_sesion
     `;
     return result[0] as { id_sesion: number };
@@ -38,7 +38,7 @@ export async function createSession(idUsuario: number) {
 export async function closeSession(idSesion: number) {
     const result = await sql`
         UPDATE sesion
-        SET fecha_fin = CURRENT_TIMESTAMP, estado_sesion = false
+        SET fecha_fin = CURRENT_TIMESTAMP AT TIME ZONE 'America/Bogota', estado_sesion = false
         WHERE id_sesion = ${idSesion}
         RETURNING id_sesion, estado_sesion
     `;
