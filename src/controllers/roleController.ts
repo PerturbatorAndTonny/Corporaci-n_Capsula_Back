@@ -19,7 +19,13 @@ export const updateUserRole = async (req: Request, res: Response) => {
 
     if (isUserExist.id_usuario === Number(id)){
       return res.status(400).json({
-        message: "El rol a cambiar es el mismo que vas a asignar"
+        message: "No puedes modificar tu propio rol"
+      })
+    }
+
+    if(isUserExist.id_rol === role) {
+      return res.status(400).json({
+        message: "El usuario ya tiene asignado ese rol"
       })
     }
 
