@@ -9,7 +9,6 @@ export const schemaUserCreate = z.strictObject({
         error: "La edad es requerida",
     }).int("La edad debe ser un número entero").positive("La edad debe ser un número positivo"),
 
-
     contraseña: z.string({
         error: "La contraseña es requerida",
     }).min(8, "La contraseña debe tener al menos 8 caracteres"),
@@ -23,7 +22,9 @@ export const schemaUserCreate = z.strictObject({
         5 - Inventor/Tester,
         6 - Gestor de proyectos,
         7 - Usuario
-        `).max(7, 'Los roles son solo valores entre 1 y 7').max(7, "Los roles son solo valores entre 1 y 7")
+        `).max(7, 'Los roles son solo valores entre 1 y 7').max(7, "Los roles son solo valores entre 1 y 7"),
+        
+    authType: z.enum(['DNA_SAIYAN', 'DNA_HUMAN'])
 });
 
 export type UserCreate = z.infer<typeof schemaUserCreate>;
