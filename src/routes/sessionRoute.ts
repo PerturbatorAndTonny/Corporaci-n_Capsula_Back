@@ -3,6 +3,7 @@ import { newSession, closeSession } from "../controllers/sessionController.js";
 import { verifyData } from "../middlewares/verifyData.js"
 import { authSchema } from "../schemas/authSchema.js";
 import { verifyToken, verifyRole } from "../middlewares/verifyToken.js"
+import { incidenteMiddleware } from "../middlewares/incident.js";
 
 const router: Router = Router();
 
@@ -14,6 +15,6 @@ router.delete("/auth/logout", verifyToken, verifyRole(
   "Especialista en seguridad",
   "Inventor/Tester", "Gestor de proyectos",
   "Usuario"
-), closeSession);
+), incidenteMiddleware, closeSession);
 
 export default router;

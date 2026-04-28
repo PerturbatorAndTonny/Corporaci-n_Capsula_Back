@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
-// Le ponemos Alias a las funciones de utilidades para no confundirlas
-import { createSession as generateJWT, addToBlacklist } from "../utils/session.js"; 
+import { createSession, addToBlacklist, isBlocked, registerFailedAttempt, resetAttempts } from "../utils/session.js";
 import type { AuthInput } from "../schemas/authSchema.js";
 
 // Importamos las nuevas funciones de base de datos con Alias
@@ -17,6 +16,16 @@ export const newSession = async (req: Request, res: Response) => {
   try {
     const { userName, password } = req.body as AuthInput;
 
+     const blockStatus = isBlocked(userName);
+
+    if (blockStatus.blocked) {
+      return res.status(423).json({
+        messageError: `Cuenta bloqueada. Intenta en ${Math.ceil(
+          blockStatus.remaining / 1000
+        )} segundos`,
+      })
+    }
+
     const isUserExist = await getUserCredentials(userName)
 
     if (!isUserExist) {
@@ -24,16 +33,31 @@ export const newSession = async (req: Request, res: Response) => {
         messageError: "user not found"
       })
     }
-
-    const isSame = await comparePass(password, isUserExist.password)
-
-    if (!isSame) {
-      return res.status(401).json({
-        messageError: "Invalid credentials, try again"
-      })
+      //Verificar cuenta activa
+      if (!isUserExist.estado) {
+      return res.status(403).json({
+        messageError: "Cuenta inactiva, contacta al administrador",
+      });
     }
 
-    // 1. Obtenemos los datos del usuario (ahora incluye el id_usuario)
+      const isSame = await comparePass(password, isUserExist.password);
+
+    if (!isSame) {
+      const attempt = registerFailedAttempt(userName);
+
+      if (attempt.blockedUntil) {
+        return res.status(423).json({
+          messageError: "Cuenta bloqueada por múltiples intentos fallidos",
+        });
+      }
+
+      return res.status(401).json({
+        messageError: "Invalid credentials, try again",
+      });
+    }
+
+    resetAttempts(userName); //Si se inicia sesion de forma correcta, se reinician los intentos
+
     const credential = await getUserRole(userName)
 
     // 2. REGISTRAR LA AUDITORÍA EN LA BASE DE DATOS

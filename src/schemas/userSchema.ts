@@ -23,7 +23,6 @@ export const schemaUserCreate = z.strictObject({
         6 - Gestor de proyectos,
         7 - Usuario
         `).max(7, 'Los roles son solo valores entre 1 y 7').max(7, "Los roles son solo valores entre 1 y 7"),
-        
     authType: z.enum(['DNA_SAIYAN', 'DNA_HUMAN'])
 });
 
