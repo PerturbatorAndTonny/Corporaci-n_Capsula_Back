@@ -59,7 +59,7 @@ export const newSession = async (req: Request, res: Response) => {
 
     const credential = await getUserRole(userName)
 
-    const token = await createSession({ role: credential.nombre_rol })
+    const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario })
 
     return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
