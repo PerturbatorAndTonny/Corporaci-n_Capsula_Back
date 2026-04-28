@@ -1,19 +1,20 @@
 import type { Request, Response } from "express";
 import { createSession, addToBlacklist, isBlocked, registerFailedAttempt, resetAttempts } from "../utils/session.js";
 import type { AuthInput } from "../schemas/authSchema.js";
-//import { usersDB } from "../models/userModel.js";
 
-import { getUserCredentials, getUserRole } from '../models/sessionModel.js'
+// Importamos las nuevas funciones de base de datos con Alias
+import { 
+  getUserCredentials, 
+  getUserRole, 
+  createSession as dbCreateSession, 
+  closeSession as dbCloseSession 
+} from '../models/sessionModel.js';
 
 import { comparePass } from "../utils/pass.js";
 
 export const newSession = async (req: Request, res: Response) => {
   try {
-    // oxlint-disable-next-line no-unused-vars
     const { userName, password } = req.body as AuthInput;
-    // userId es cambiable por email (no afecta el flujo)
-    // authHash depende del metodo de autheticacion que tenga el user
-    // al implementarlo, sigue la logica del password
 
      const blockStatus = isBlocked(userName);
 
@@ -60,6 +61,9 @@ export const newSession = async (req: Request, res: Response) => {
     const credential = await getUserRole(userName)
 
     const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario })
+    // 2. REGISTRAR LA AUDITORÍA EN LA BASE DE DATOS
+    // Se crea la sesión en la tabla y obtenemos el id generado por PostgreSQL
+    const sessionRecord = await dbCreateSession(credential.id_usuario);
 
     return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
@@ -74,11 +78,21 @@ export const newSession = async (req: Request, res: Response) => {
   }
 }
 
-export const closeSession = (req: Request, res: Response) => {
+// Convertimos la función a async para poder interactuar con la DB
+export const closeSession = async (req: Request, res: Response) => {
   try {
-
     const { token } = req.cookies
 
+    // 1. Extraemos el id_session que el middleware decodificó previamente
+    // (Aprovechamos el tipado global que tus compañeros hicieron en global.ts)
+    const id_session = req.user?.id_session;
+
+    // 2. ACTUALIZAR LA BASE DE DATOS (Marcar salida y estado = false)
+    if (id_session) {
+        await dbCloseSession(id_session);
+    }
+
+    // 3. Proceso estándar de cierre
     addToBlacklist(token)
     
     res.clearCookie("token").json({
