@@ -60,15 +60,10 @@ export const newSession = async (req: Request, res: Response) => {
 
     const credential = await getUserRole(userName)
 
+    const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario })
     // 2. REGISTRAR LA AUDITORÍA EN LA BASE DE DATOS
     // Se crea la sesión en la tabla y obtenemos el id generado por PostgreSQL
     const sessionRecord = await dbCreateSession(credential.id_usuario);
-
-    // 3. GENERAR EL TOKEN (Incluyendo el nuevo id_session en el payload)
-    const token = await generateJWT({ 
-        role: credential.nombre_rol,
-        id_session: sessionRecord.id_sesion 
-    })
 
     return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
