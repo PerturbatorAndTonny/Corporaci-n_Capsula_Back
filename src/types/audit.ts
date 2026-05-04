@@ -1,6 +1,6 @@
 export interface AuditoriaPayload {
   nombre_tabla: string;
-  accion: "CREATE" | "UPDATE" | "DELETE";
+  accion: "CREATE" | "UPDATE" | "DELETE" | "LOGIN" | "LOGOUT";
   id_usuario: number;
   id_artefacto?: number;
   valor_anterior: string | null;
@@ -9,7 +9,7 @@ export interface AuditoriaPayload {
 
 export interface RegistroAuditoria {
   nombre_tabla: string;
-  accion: "CREATE" | "UPDATE" | "DELETE";
+  accion: "CREATE" | "UPDATE" | "DELETE" | "LOGIN" | "LOGOUT";
   id_usuario: number;
   id_artefacto?: number;
   valor_anterior: string | null;
