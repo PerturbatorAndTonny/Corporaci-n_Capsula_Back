@@ -5,12 +5,30 @@ import { createArtifactSchema, patchArtifactSchema  } from '../schemas/artifactS
 import { verifyRole, verifyToken } from '../middlewares/verifyToken.js';
 import { incidenteMiddleware } from '../middlewares/incident.js';
 
-
 const router = Router();
 
-router.post("/artifacts", verifyToken, verifyRole("Administrador"),verifyData(createArtifactSchema), incidenteMiddleware, createArtifact);
+router.post("/artifacts", verifyToken, verifyRole(
+  "Administrador", 
+  "Directora de Innovacion", 
+  "Experto en tecnologia extraterrestre", 
+  "Especialista en seguridad", 
+  "Inventor/Tester", 
+  "Gestor de proyectos"), 
+  verifyData(createArtifactSchema), incidenteMiddleware, createArtifact);
 router.get("/artifacts", verifyToken, incidenteMiddleware, getArtifacts);
-router.patch("/artifacts/:id", verifyToken, verifyRole("Administrador", "Gestor de proyectos", "Usuario"), verifyData(patchArtifactSchema), incidenteMiddleware, patchArtifacts);
-router.get("/artifacts/:id", verifyToken, incidenteMiddleware, getArtifactById); 
-router.delete("/artifacts/:id", verifyToken, verifyRole("Administrador"), incidenteMiddleware, deleteArtifact);
+router.patch("/artifacts/:id", verifyToken, verifyRole("Administrador", 
+  "Directora de Innovacion", 
+  "Experto en tecnologia extraterrestre", 
+  "Especialista en seguridad", 
+  "Inventor/Tester", 
+  "Gestor de proyectos", 
+  "Usuario"), 
+  verifyData(patchArtifactSchema), incidenteMiddleware, patchArtifacts);
+router.get("/artifacts/:id", verifyToken, incidenteMiddleware, getArtifactById);
+router.delete("/artifacts/:id", verifyToken, verifyRole("Administrador", 
+  "Directora de Innovacion", 
+  "Experto en tecnologia extraterrestre", 
+  "Especialista en seguridad", 
+  "Gestor de proyectos"), 
+  incidenteMiddleware, deleteArtifact);
 export default router;
