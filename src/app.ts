@@ -8,6 +8,7 @@ import userRoute from "./routes/userRoute.js";
 import artifactRoutes from "./routes/artifactRoute.js";
 import authRoute from "./routes/sessionRoute.js"
 import roleRoute from "./routes/roleRoute.js"
+import auditRoute from "./routes/auditRoute.js"
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use('/api/v1', artifactRoutes);
 app.use('/api/v1', userRoute);
 app.use("/api/v1", authRoute)
 app.use("/api/v1/", roleRoute)
-
+app.use("/api/v1/", auditRoute)
 
 app.use((req: Request, res: Response, _next: NextFunction) => {
   res.status(404).json({
