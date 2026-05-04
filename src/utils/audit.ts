@@ -17,7 +17,7 @@ function buildRegistroAuditoria(payload: AuditoriaPayload): RegistroAuditoria {
 
 export async function registrarAuditoria(payload: AuditoriaPayload): Promise<void> {
   const registry = buildRegistroAuditoria(payload);
-  console.log("📝 [Auditoría] Registrando:", registry);
+  console.log("[Auditoría] Registrando", registry);
   await sql`
   INSERT INTO auditoria (
       nombre_tabla,
@@ -31,9 +31,9 @@ export async function registrarAuditoria(payload: AuditoriaPayload): Promise<voi
         ${registry.nombre_tabla},
         ${registry.accion},
         ${registry.id_usuario},
-        ${registry.id_artefacto || null},  // CAMBIADO: manejo de null
-        ${registry.valor_anterior || null},  // CAMBIADO: manejo de null
-        ${registry.valor_nuevo || null},  // CAMBIADO: manejo de null
+        ${registry.id_artefacto || null},
+        ${registry.valor_anterior || null},
+        ${registry.valor_nuevo || null},
         ${registry.fecha_operacion}
     )
   `
