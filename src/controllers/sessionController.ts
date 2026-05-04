@@ -1,13 +1,15 @@
+// oxlint-disable max-lines-per-function
 import type { Request, Response } from "express";
 import { createSession, addToBlacklist, isBlocked, registerFailedAttempt, resetAttempts } from "../utils/session.js";
 import type { AuthInput } from "../schemas/authSchema.js";
+import { registrarAuditoria } from "../utils/audit.js"
 
 // Importamos las nuevas funciones de base de datos con Alias
-import { 
-  getUserCredentials, 
-  getUserRole, 
-  createSession as dbCreateSession, 
-  closeSession as dbCloseSession 
+import {
+  getUserCredentials,
+  getUserRole,
+  createSession as dbCreateSession,
+  closeSession as dbCloseSession
 } from '../models/sessionModel.js';
 
 import { comparePass } from "../utils/pass.js";
@@ -16,7 +18,7 @@ export const newSession = async (req: Request, res: Response) => {
   try {
     const { userName, password } = req.body as AuthInput;
 
-     const blockStatus = isBlocked(userName);
+    const blockStatus = isBlocked(userName);
 
     if (blockStatus.blocked) {
       return res.status(423).json({
@@ -33,14 +35,14 @@ export const newSession = async (req: Request, res: Response) => {
         messageError: "user not found"
       })
     }
-      //Verificar cuenta activa
-      if (!isUserExist.estado) {
+    //Verificar cuenta activa
+    if (!isUserExist.estado) {
       return res.status(403).json({
         messageError: "Cuenta inactiva, contacta al administrador",
       });
     }
 
-      const isSame = await comparePass(password, isUserExist.password);
+    const isSame = await comparePass(password, isUserExist.password);
 
     if (!isSame) {
       const attempt = registerFailedAttempt(userName);
@@ -60,10 +62,19 @@ export const newSession = async (req: Request, res: Response) => {
 
     const credential = await getUserRole(userName)
 
-    const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario })
     // 2. REGISTRAR LA AUDITORÍA EN LA BASE DE DATOS
     // Se crea la sesión en la tabla y obtenemos el id generado por PostgreSQL
     const sessionRecord = await dbCreateSession(credential.id_usuario);
+
+    const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario, id_session: sessionRecord.id_sesion })
+
+    await registrarAuditoria({
+      nombre_tabla: "sesiones",
+      accion: "LOGIN",
+      id_usuario: credential.id_usuario,
+      valor_anterior: null,
+      valor_nuevo: JSON.stringify({ usuario: userName, rol: credential.nombre_rol })
+    })
 
     return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
@@ -89,12 +100,20 @@ export const closeSession = async (req: Request, res: Response) => {
 
     // 2. ACTUALIZAR LA BASE DE DATOS (Marcar salida y estado = false)
     if (id_session) {
-        await dbCloseSession(id_session);
+      await dbCloseSession(id_session);
     }
+
+    await registrarAuditoria({
+      nombre_tabla: "sesiones",
+      accion: "LOGOUT",
+      id_usuario: Number(req.user?.id_usuario),
+      valor_anterior: JSON.stringify({ session_id: id_session }),
+      valor_nuevo: null
+    });
 
     // 3. Proceso estándar de cierre
     addToBlacklist(token)
-    
+
     res.clearCookie("token").json({
       message: "Session closed successfully"
     })

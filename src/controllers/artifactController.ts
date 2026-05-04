@@ -60,7 +60,7 @@ export const patchArtifacts = async (req: Request<{ id: string }, {}, PatchArtif
     const { id } = req.params;
 
     //Obtener estado actual
-    const currentArtifact = await ArtifactModel.getOneArtifact(Number(id));
+    const currentArtifact = await ArtifactModel.getOneArtifactById(Number(id));
 
     if (!currentArtifact) {
       return res.status(404).json({ message: "Artifact not found" });

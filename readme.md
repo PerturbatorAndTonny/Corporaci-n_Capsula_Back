@@ -22,6 +22,8 @@ En una carpeta de tu equipo, haz un clon del proyecto y dependiendo del gestor d
 Abre el editor de codigo y agrega el archivo **.env** con las  siguientes variables
 ```env
  PORT=<puerto de preferencia>
+ NEON_URI="postgresql://<usuario_DB>:<contraseña_DB><URI_localisación>/<nombre_DB>?sslmode=require"
+ JWT_SECRET='Firma token aqui'
 ```
 
 una vez hecho esto, ejecuta el comando _dev_ con el gestor de dependencias para **desarrollo** o _start_ para inicial la API en **despliegue**

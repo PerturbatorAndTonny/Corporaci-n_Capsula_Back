@@ -15,14 +15,18 @@ export interface Artifact {
 
 export async function getAllArtifacts(): Promise<Artifact[]> {
   const result = await sql`SELECT * FROM artefacto ORDER BY id_artefacto ASC`;
-  //console.log(result) verificar resultados
   return result as Artifact[];
 }
 
 export async function getOneArtifact(id: number): Promise<Artifact | null> {
   const result = await sql`
+    SELECT * FROM artefacto WHERE id_artefacto = ${id} AND estado = true`;
+  return (result[0] as Artifact) || null;
+}
+
+export async function getOneArtifactById(id: number): Promise<Artifact | null> {
+  const result = await sql`
     SELECT * FROM artefacto WHERE id_artefacto = ${id}`;
-   // console.log("artifact: ", result)
   return (result[0] as Artifact) || null;
 }
 
@@ -67,11 +71,14 @@ export async function updateArtifact(id: number, data: any) {
     updates.push(sql`nivel_peligrosidad = ${data.nivel_peligrosidad}`);
   }
 
+  if (data.estado !== undefined) {
+    updates.push(sql`estado = ${data.estado}`);
+  }
+
   if (updates.length === 0) {
     throw new Error("No fields to update");
   }
 
-  //Crear la consulta
   const result = await sql`
     UPDATE artefacto
     SET ${updates.reduce((prev, curr, i) => 
@@ -80,8 +87,6 @@ export async function updateArtifact(id: number, data: any) {
     WHERE id_artefacto = ${id}
     RETURNING *
   `;
-
-  //console.log("data updated", result)
 
   return result[0];
 }

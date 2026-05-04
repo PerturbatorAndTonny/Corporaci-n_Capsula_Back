@@ -18,25 +18,20 @@ export async function createUser(user: User, idRol: number = 7) {
 }
 
 export async function getUsers(roleId?: number) {
-    // Si enviaron un rol específico, filtramos por ese ID
     if (roleId) {
-        const result = await sql`
-            SELECT u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
-            FROM usuario u
-            JOIN rol r ON u.id_rol = r.id_rol
-            WHERE u.id_rol = ${roleId}
-        `;
-        return result;
-    } 
-    // Si no enviaron rol, devolvemos todos los usuarios
-    else {
-        const result = await sql`
-            SELECT u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
-            FROM usuario u
-            JOIN rol r ON u.id_rol = r.id_rol
-        `;
-        return result;
+    return await sql`
+        SELECT u.id_usuario, u.nombre, u.edad, r.id_rol, r.nombre_rol AS rol, r.nivel_seguridad
+        FROM usuario u
+        JOIN rol r ON u.id_rol = r.id_rol
+        WHERE u.id_rol = ${roleId}
+  `;
     }
+
+    return await sql`
+        SELECT u.id_usuario, u.nombre, u.edad, r.id_rol, r.nombre_rol AS rol, r.nivel_seguridad 
+        FROM usuario u
+        JOIN rol r ON u.id_rol = r.id_rol
+  `
 }
 
 
@@ -57,7 +52,7 @@ export async function updateUserById(id: number, updates: Partial<User>) {
 
 export async function getUserById(id: number) {
     const result = await sql`
-        SELECT u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
+        SELECT u.id_usuario, u.nombre, u.edad, r.nombre_rol AS rol, r.nivel_seguridad
         FROM usuario u
         JOIN rol r ON u.id_rol = r.id_rol
         WHERE u.id_usuario = ${id}

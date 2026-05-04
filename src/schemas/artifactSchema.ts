@@ -13,7 +13,7 @@ export const originEnum = z.enum([
   'NAMEKIANO'
 ]);
 
-export const dangerLevelEnum = z.union([  
+export const dangerLevelEnum = z.union([
   z.literal(1),
   z.literal(2),
   z.literal(3),
@@ -32,8 +32,8 @@ export const createArtifactSchema = z.object({
   nombre_artefacto: z.string().min(1, 'Name is required'),
   descripcion: z.string().min(1, 'Description is required'),
   fecha_creacion: z.string().regex(
-  /^\d{4}-\d{2}-\d{2}$/,
-  "Formato debe ser YYYY-MM-DD").min(1, 'Date is required'),
+    /^\d{4}-\d{2}-\d{2}$/,
+    "Formato debe ser YYYY-MM-DD").min(1, 'Date is required'),
   id_tipo: z.number().min(1, 'Artifact type is required'),
   id_categoria: categoryEnum,
   origen: originEnum,
@@ -53,6 +53,9 @@ export const patchArtifactSchema = createArtifactSchema
     nivel_peligrosidad: true
   })
   .partial()
+  .extend({
+    estado: z.boolean().optional() 
+  })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided'
   });

@@ -6,9 +6,11 @@ import { isBlacklisted } from '../utils/session.js'
 const secret = process.env.JWT_SECRET as string
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  const { token } = req.cookies
 
-  if (!token) {
+  const authHeader = req.headers.authorization as string;
+  const token = authHeader?.split(" ")[1];
+
+  if (!authHeader) {
     res.status(401).json({ error: "Token requerido" });
     return;
   }
