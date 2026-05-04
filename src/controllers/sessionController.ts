@@ -1,3 +1,4 @@
+// oxlint-disable max-lines-per-function
 import type { Request, Response } from "express";
 import { createSession, addToBlacklist, isBlocked, registerFailedAttempt, resetAttempts } from "../utils/session.js";
 import type { AuthInput } from "../schemas/authSchema.js";
@@ -60,10 +61,11 @@ export const newSession = async (req: Request, res: Response) => {
 
     const credential = await getUserRole(userName)
 
-    const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario })
     // 2. REGISTRAR LA AUDITORÍA EN LA BASE DE DATOS
     // Se crea la sesión en la tabla y obtenemos el id generado por PostgreSQL
     const sessionRecord = await dbCreateSession(credential.id_usuario);
+
+    const token = await createSession({ role: credential.nombre_rol, id_usuario: credential.id_usuario, id_session: sessionRecord.id_sesion })
 
     return res.status(200).cookie("token", token).json({
       message: "Session created successfully",
