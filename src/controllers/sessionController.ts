@@ -16,7 +16,7 @@ import { comparePass } from "../utils/pass.js";
 
 export const newSession = async (req: Request, res: Response) => {
   try {
-    const { userName, password } = req.body as AuthInput;
+    const { userName, password, biometria } = req.body as AuthInput;
 
     const blockStatus = isBlocked(userName);
 
@@ -57,6 +57,24 @@ export const newSession = async (req: Request, res: Response) => {
         messageError: "Invalid credentials, try again",
       });
     }
+
+    // ==========================================
+    // VALIDACIÓN BIOMÉTRICA (CÁMARA)
+    // ==========================================
+    if (isUserExist.biometria !== biometria) {
+      const attempt = registerFailedAttempt(userName);
+
+      if (attempt.blockedUntil) {
+        return res.status(423).json({
+          messageError: "Cuenta bloqueada por múltiples intentos biométricos fallidos",
+        });
+      }
+
+      return res.status(401).json({
+        messageError: "Fallo en autenticación biométrica. Tarjeta no reconocida.",
+      });
+    }
+    // ==========================================
 
     resetAttempts(userName); //Si se inicia sesion de forma correcta, se reinician los intentos
 
