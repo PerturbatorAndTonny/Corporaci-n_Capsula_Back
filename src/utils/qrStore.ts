@@ -1,0 +1,1 @@
+export const activeQrCodes =new Map<string, string>();

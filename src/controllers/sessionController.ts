@@ -3,7 +3,9 @@ import type { Request, Response } from "express";
 import { createSession, addToBlacklist, isBlocked, registerFailedAttempt, resetAttempts } from "../utils/session.js";
 import type { AuthInput } from "../schemas/authSchema.js";
 import { registrarAuditoria } from "../utils/audit.js"
+import { activeQrCodes } from "../utils/qrStore.js";
 
+import * as  QRCode  from "qrcode";
 // Importamos las nuevas funciones de base de datos con Alias
 import {
   getUserCredentials,
@@ -13,6 +15,9 @@ import {
 } from '../models/sessionModel.js';
 
 import { comparePass } from "../utils/pass.js";
+import { z } from "zod";
+
+
 
 export const newSession = async (req: Request, res: Response) => {
   try {
@@ -59,7 +64,7 @@ export const newSession = async (req: Request, res: Response) => {
     }
 
     // ==========================================
-    // VALIDACIÓN BIOMÉTRICA (CÁMARA)
+    // VALIDACIÓN BIOMÉTRICA (CÁMARA) 
     // ==========================================
     if (isUserExist.biometria !== biometria) {
       const attempt = registerFailedAttempt(userName);
@@ -78,8 +83,78 @@ export const newSession = async (req: Request, res: Response) => {
 
     resetAttempts(userName); //Si se inicia sesion de forma correcta, se reinician los intentos
 
-    const credential = await getUserRole(userName)
+    
 
+
+    
+    //==========================================
+    //Uso codigo QR
+    //==========================================
+
+const generateQr = async (req: Request, res: Response) => {
+  try {
+    const { userName } = req.body;
+
+    // 1. generar código aleatorio de 6 dígitos
+    const qrValue = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 2. guardar en memoria (usuario → código)
+    activeQrCodes.set(userName, qrValue);
+
+    // 3. convertir a imagen QR
+    const qrImage = await QRCode.toDataURL(qrValue);
+
+    // 4. enviar al frontend
+    return res.status(200).json({
+      message: "QR generado correctamente",
+      qr: qrImage
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+const validateQr = async (req: Request, res: Response) => {
+  try {
+    const { userName, qrValue } = req.body;
+
+    // 1. buscar QR guardado en memoria
+    const storedQr = activeQrCodes.get(userName);
+
+    // 2. si no existe
+    if (!storedQr) {
+      return res.status(404).json({
+        message: "QR no encontrado o expirado"
+      });
+    }
+
+    // 3. comparar QR
+    if (storedQr !== qrValue) {
+      return res.status(401).json({
+        message: "QR inválido"
+      });
+    }
+
+    // 4. eliminar QR (uso único)
+    activeQrCodes.delete(userName);
+
+    // 5. crear sesión (DB)
+    const session = await createSession(userName);
+
+    // 6. respuesta exitosa
+    return res.status(200).json({
+      message: "QR válido, sesión creada",
+      session
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error });
+  }
+};
+
+ 
+const credential = await getUserRole(userName)
     // 2. REGISTRAR LA AUDITORÍA EN LA BASE DE DATOS
     // Se crea la sesión en la tabla y obtenemos el id generado por PostgreSQL
     const sessionRecord = await dbCreateSession(credential.id_usuario);
@@ -106,6 +181,8 @@ export const newSession = async (req: Request, res: Response) => {
     })
   }
 }
+
+
 
 // Convertimos la función a async para poder interactuar con la DB
 export const closeSession = async (req: Request, res: Response) => {
