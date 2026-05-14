@@ -19,11 +19,11 @@ export const updateUserRole = async (req: Request, res: Response) => {
       })
     }
 
-    if (isUserExist.id_usuario === Number(id)) {
-      return res.status(400).json({
-        message: "No puedes modificar tu propio rol"
-      })
-    }
+if (Number(req.user?.id_usuario) === Number(id)) {
+  return res.status(400).json({
+    message: "No puedes modificar tu propio rol"
+  })
+}
 
     if (isUserExist.id_rol === role) {
       return res.status(400).json({
