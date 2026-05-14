@@ -16,7 +16,7 @@ import { comparePass } from "../utils/pass.js";
 
 export const newSession = async (req: Request, res: Response) => {
   try {
-    const { userName, password } = req.body as AuthInput;
+    const { userName, password, biometria } = req.body as AuthInput;
 
     const blockStatus = isBlocked(userName);
 
@@ -43,6 +43,16 @@ export const newSession = async (req: Request, res: Response) => {
     }
 
     const isSame = await comparePass(password, isUserExist.password);
+
+    if (biometria !== undefined) {
+      console.log("🔍 [DEBUG biometria] Recibida del QR:", JSON.stringify(biometria))
+      console.log("🔍 [DEBUG biometria] En DB para", userName, ":", JSON.stringify(isUserExist.biometria))
+      if (isUserExist.biometria !== biometria) {
+        return res.status(401).json({
+          messageError: "Código biométrico inválido",
+        });
+      }
+    }
 
     if (!isSame) {
       const attempt = registerFailedAttempt(userName);
@@ -83,8 +93,10 @@ export const newSession = async (req: Request, res: Response) => {
     })
 
   } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error("❌ [newSession] Error:", msg)
     return res.status(500).json({
-      message: error,
+      message: msg,
     })
   }
 }
